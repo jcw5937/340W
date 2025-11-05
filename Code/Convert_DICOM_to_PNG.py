@@ -9,31 +9,30 @@
 # One full image might have multiple ROIs. It was important to add different suffixes, prefixes, etc., while keeping the Subject ID the same while saving the converted images.
 
 # Install pydicom if needed
-#pip install pydicom
+
 # Load modules
+#-----------------------
+# Adjusted for cluster 
+#-----------------------
 import os
 import cv2
 import shutil
 import torch
 from torchvision import transforms
-from google.colab import drive
 import pydicom
 from PIL import Image
 import pandas as pd
+from zipfile import ZipFile
 
-# Load the images
-# Connect with google drive, feel free to delete this part if you didn't use google drive to save your downloaded images
-# Connect with Google Drive
-# Assuming you have already mounted Google Drive in your environment
-drive.mount('/content/drive')
-
-# Unzip the downloaded images
-# Replace this with the correct path to your zip file
-!unzip /content/drive/MyDrive/CBIS-DDSM/roi_crop_train.zip
+#-----------------------
+# Adjusted for cluster 
+#-----------------------
+# Set the base directory
+base_dir = "/data/ds340w/data"
 
 # Read in the description csv files
-train = pd.read_csv('/content/drive/MyDrive/CBIS-DDSM/mass_case_description_train_set.csv')
-test = pd.read_csv('/content/drive/MyDrive/CBIS-DDSM/mass_case_description_test_set.csv')
+train = pd.read_csv(os.path.join(base_dir, "cbis_ddsm_split_train_70_10_20.csv"))
+test  = pd.read_csv(os.path.join(base_dir, "cbis_ddsm_split_test_70_10_20.csv"))
 
 # Extract the columns we are interested in
 train_need = train[['patient_id', 'pathology', 'image file path', 'cropped image file path', 'ROI mask file path']]
@@ -184,8 +183,13 @@ def convert_dcm_to_png(source_folder, destination_root):
     })
 
 # Specify the source folder and destination folder, make sure they exist
-source_folder = "/content/mass_train_ROI/manifest-LyDgOQGl3853937313152078328/CBIS-DDSM"
-destination_root = "/content/roi_train"
+
+#-----------------------
+# Adjusted for cluster 
+#-----------------------
+
+source_folder = os.path.join(base_dir, "manifest-ZkhPvrLo5216730872708713142", "CBIS-DDSM")
+destination_root = os.path.join(base_dir, "roi_train")
 
 # Call the functon to convert DICOM files to PNG and get the total number of failed conversions and DataFrame
 # The function will return the number of failed conversions and the paths of the images before and after conversion as well
@@ -213,8 +217,13 @@ def move_images(root_dir, dest_dir):
             print(f"Moved: {source_path} -> {dest_path}")
 
 # Specify the root directory containing images and the destination directory
-root_dir = "/content/roi_train"
-dest_dir = "/content/roi_train_needed"
+
+#-----------------------
+# Adjusted for cluster 
+#-----------------------
+
+root_dir = destination_root
+dest_dir = os.path.join(base_dir, "roi_train_needed")
 
 # Call the function to move images
 move_images(root_dir, dest_dir)

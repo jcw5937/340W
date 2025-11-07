@@ -9,12 +9,16 @@ import numpy as np
 from keras.preprocessing.image import ImageDataGenerator
 import os
 
+#######################
+# Updated for Cluster #
+#######################
 
-# Define the directory containing the original images
-original_dir = '/content/all_598'
+BASE_DIR = "/data/ds340w"
+WORK_DIR = os.path.join(BASE_DIR, "work")
 
-# Define the directory to save the augmented images
-augmented_dir = '/content/all_598_augmented'
+original_dir  = os.path.join(WORK_DIR, "train_598")         # input dataset
+augmented_dir = os.path.join(WORK_DIR, "train_598_augmented")  # output dataset
+os.makedirs(augmented_dir, exist_ok=True)
 
 # Ensure the augmented directory exists, create if not
 if not os.path.exists(augmented_dir):

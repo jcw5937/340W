@@ -11,22 +11,21 @@
 
 # Load modules
 import os
-import pydicom
+# import pydicom
 from PIL import Image
 import shutil
-import cv2
+# import cv2
 import torch
 from torchvision import transforms
 import numpy as np
 import pandas as pd
 import matplotlib.pyplot as plt
-import PIL
-from PIL import Image
-import matplotlib.image as mpimg
+# import PIL
+# import matplotlib.image as mpimg
 import random
-from keras.utils import to_categorical
-from concurrent.futures import ThreadPoolExecutor
-from glob import glob
+# from keras.utils import to_categorical
+# from concurrent.futures import ThreadPoolExecutor
+# from glob import glob
 
 #### Added for clster
 BASE_DIR = "/data/ds340w"
@@ -107,7 +106,7 @@ original_df = df[df['File_Paths'].apply(check_filename)]
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-import timm
+# import timm
 import torchvision.models as models
 from torchvision.models import ResNet50_Weights
 

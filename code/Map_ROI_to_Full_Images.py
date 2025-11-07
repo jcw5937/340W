@@ -40,8 +40,19 @@ def extract_names_from_folder(folder_path):
     return extracted_data
 
 # Specify the paths of the two folders to compare, feel free to edit the directory
-folder1_path = "/content/roi_train_needed"
-folder2_path = "/content/full_train_needed"
+
+#####################
+# Added for Cluster #
+#####################
+
+BASE_DIR = "/data/ds340w"                   # cluster base directory
+WORK_DIR = os.path.join(BASE_DIR, "work")   # where your intermediate folders live
+
+folder1_path = os.path.join(WORK_DIR, "roi_train_needed")
+folder2_path = os.path.join(WORK_DIR, "full_train_needed")
+save_folder  = os.path.join(WORK_DIR, "train_same_size")
+
+os.makedirs(save_folder, exist_ok=True)     # ensure output folder exists exactly once
 
 # Extract data from both folders and convert them to dataframe
 data_in_folder1 = extract_names_from_folder(folder1_path)
@@ -62,7 +73,9 @@ mismated_info = []
 for index, row in common_data_df.iterrows():
     roi_path = row['path_ROI']
     full_path = row['path_Full']
-    name = row['path_ROI'].split('/')[-1]
+    if pd.isna(roi_path) or pd.isna(full_path): # added check for cluster
+        continue
+    name = os.path.basename(row['path_ROI']) # changed for cluster
     name = name.replace("_content_mass_test_failed_", "")
 
     # Open ROI and full images
@@ -80,7 +93,7 @@ print("All images successfully processed.")
 if mismated_info:
     df_mismated = pd.DataFrame(mismated_info, columns=['Image Name', 'Full Image Size', 'ROI Size'])
     df_mismated.to_csv('mismated_image_info.csv', index=False)
-    print("Mismated images information saved to mismated_images_info.csv.")
+    print("Mismated images information saved to mismated_image_info.csv.")
 else:
     print("No mismated images found.")
 
@@ -92,7 +105,9 @@ else:
 for index, row in common_data_df.iterrows():
     roi_path = row['path_ROI']
     full_path = row['path_Full']
-    name = row['path_ROI'].split('/')[-1]
+    if pd.isna(roi_path) or pd.isna(full_path): # added check for cluster
+        continue
+    name = os.path.basename(row['path_ROI']) # Changed for cluster
     name = name.replace("_content_mass_test_failed_", "")
 
     # Open ROI and full images
@@ -128,7 +143,7 @@ for index, row in common_data_df.iterrows():
     full_image.paste(roi_image, mask_position, roi_image)
 
     # Prepare the save path with the corresponding number of underscores
-    save_path = f"/content/train_same_size/{name}"
+    save_path = os.path.join(save_folder, name)
 
     # Save the processed full image
     full_image.save(save_path)

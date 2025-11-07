@@ -6,6 +6,16 @@
 import os
 from PIL import Image
 
+#####################
+# Added for Cluster #
+#####################
+
+BASE_DIR = "/data/ds340w"
+WORK_DIR = os.path.join(BASE_DIR, "work")
+IN_DIR   = os.path.join(WORK_DIR, "train_same_size")
+OUT_DIR  = os.path.join(WORK_DIR, "train_598")
+os.makedirs(OUT_DIR, exist_ok=True)
+
 #define the function to find the geometric center
 def find_nonzero_center(img):
     # get the width and height from the image size
@@ -65,4 +75,4 @@ def extract_center_for_folder(input_folder, output_folder, output_size):
 
 # Call the function for cropping
 # Adjust the input directory and the destination directory to suit your need
-extract_center_for_folder("/content/train_same_size", "/content/train_598", 598)
+extract_center_for_folder(IN_DIR, OUT_DIR, 598)

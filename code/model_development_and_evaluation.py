@@ -7,7 +7,7 @@
 ################################
 
 # Install packages/hubs/ others needed
-pip install pydicom
+# pip install pydicom # taken out for cluter
 
 # Load modules
 import os
@@ -28,12 +28,19 @@ from keras.utils import to_categorical
 from concurrent.futures import ThreadPoolExecutor
 from glob import glob
 
+#### Added for clster
+BASE_DIR = "/data/ds340w"
+WORK_DIR = os.path.join(BASE_DIR, "work")
+MODEL_DIR = os.path.join(WORK_DIR, "models")
+os.makedirs(MODEL_DIR, exist_ok=True)
+
 # Read in the pathology info
-dicom_data = pd.read_csv('all_mass_pathology.csv')
+dicom_data = pd.read_csv(os.path.join(WORK_DIR, 'all_mass_pathology.csv')) # changed for cluster
 
 # Read in the image path info
 # Specify the root path where the .png files are located
-jpg_root_path = 'all_598_augmented'
+jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented')
+
 
 # Function to get all .png file paths in a directory
 def get_jpg_file_paths(directory):
@@ -66,7 +73,8 @@ for index, row in dicom_data.iterrows():
 df.dropna(subset=['pathology'], inplace=True)
 
 # Save the df to a CSV file as all.csv
-df.to_csv('all.csv', index=False)
+csv_path = os.path.join(WORK_DIR, 'all.csv') # changed for cluster
+df.to_csv(csv_path, index=False)
 
 ###################################
 # Label the pathology information #
@@ -92,8 +100,8 @@ original_df = df[df['File_Paths'].apply(check_filename)]
 ###################
 
 # Install tensorflow-hub and timm
-pip install tensorflow-hub
-pip install timm
+# pip install tensorflow-hub # removed for clutsre
+# pip install timm # removed for clutser
 
 # Model structure
 import torch
@@ -288,7 +296,7 @@ for epoch in range(num_epochs):
     total_samples = 0
     
     # Inside the training loop
-    for images, labels in train_loader:
+    for images, labels in train_loader_:
         images, labels = images.to(device), labels.to(device)  # Move data to GPU
         optimizer.zero_grad()  # Zero the gradients
 
@@ -312,7 +320,7 @@ for epoch in range(num_epochs):
           
     # Calculate accuracy and loss for training set
     train_accuracy = total_correct / total_samples
-    train_loss = running_loss / len(train_loader)
+    train_loss = running_loss / len(train_loader_)
     
     # Validation
     model.eval()  # Set the model to evaluation mode
@@ -346,7 +354,7 @@ for epoch in range(num_epochs):
     
     # Save model checkpoints for the last 10 epochs
     if epoch >= num_epochs - 10: # The number could be adjusted based on your needs
-        checkpoint_name = f'model_epoch_{epoch + 1}.pth'
+        checkpoint_name = os.path.join(MODEL_DIR, f'model_epoch_{epoch + 1}.pth') #changed for cluster
         torch.save(model.state_dict(), checkpoint_name)
         print(f"Checkpoint saved: {checkpoint_name}")
 
@@ -363,7 +371,9 @@ from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_sc
 # device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
 
 # Load the best model state dictionary based on the validation accuracy
-model.load_state_dict(torch.load('model_epoch_32.pth')) # You will want to update this based on your training checkpoints' performances
+model.load_state_dict( # changed for cluster
+    torch.load(os.path.join(MODEL_DIR, f'model_epoch_{num_epochs}.pth'), map_location=device)
+) # You will want to update this based on your training checkpoints' performances
 
 # Set the model to evaluation mode
 model.eval()

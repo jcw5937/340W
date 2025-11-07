@@ -9,9 +9,12 @@
 import os
 from PIL import Image
 
-# Define the source and destinaation folder
-source_folder = '/content/white_edge'
-destination_folder = '/content/adjusted/'
+# Define the source and destinaation folder CHANGED FOR CLUSTER
+BASE_DIR = "/data/ds340w"                   # cluster base
+WORK_DIR = os.path.join(BASE_DIR, "work")   # same place as the other steps
+
+source_folder      = os.path.join(WORK_DIR, "white_edge")
+destination_folder = os.path.join(WORK_DIR, "adjusted")
 
 # Create the destination folder if not existed
 if not os.path.exists(destination_folder):

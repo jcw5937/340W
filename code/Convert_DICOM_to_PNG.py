@@ -9,34 +9,39 @@
 # One full image might have multiple ROIs. It was important to add different suffixes, prefixes, etc., while keeping the Subject ID the same while saving the converted images.
 
 # Install pydicom if needed
-
+#!pip install pydicom
 # Load modules
-#-----------------------
-# Adjusted for cluster 
-#-----------------------
 import os
-import cv2
+#import cv2
 import shutil
-import torch
-from torchvision import transforms
+#import torch
+#from torchvision import transforms
+#from google.colab import drive
 import pydicom
 from PIL import Image
 import pandas as pd
-from zipfile import ZipFile
 
-#-----------------------
-# Adjusted for cluster 
-#-----------------------
-# Set the base directory
-base_dir = "/data/ds340w/data"
+# Load the images
 
-# Read in the description csv files
-train = pd.read_csv(os.path.join(base_dir, "cbis_ddsm_split_train_70_10_20.csv"))
-test  = pd.read_csv(os.path.join(base_dir, "cbis_ddsm_split_test_70_10_20.csv"))
+### >>> CLUSTER CHANGE: Define cluster-rooted paths and DO NOT mount Google Drive
+ROOT = "/data/ds340w"
+DATA_DIR = os.path.join(ROOT, "data")
+WORK_DIR = os.path.join(ROOT, "work")
+
+# Your manifest folder on the cluster:
+MANIFEST_DIR = os.path.join(DATA_DIR, "manifest-ZkhPvrLo5216730872708713142")
+
+# Where we will write PNGs (safe, writeable work area):
+PNG_OUT_DIR = os.path.join(WORK_DIR, "png")  # you can switch to "png_full" if you prefer
+os.makedirs(PNG_OUT_DIR, exist_ok=True)
+
+### >>> CLUSTER CHANGE: read from /data/ds340w/data
+train = pd.read_csv(os.path.join(DATA_DIR, 'mass_case_description_train_set.csv'))
+test  = pd.read_csv(os.path.join(DATA_DIR, 'mass_case_description_test_set.csv'))
 
 # Extract the columns we are interested in
 train_need = train[['patient_id', 'pathology', 'image file path', 'cropped image file path', 'ROI mask file path']]
-test_need = test[['patient_id', 'pathology', 'image file path', 'cropped image file path','ROI mask file path']]
+test_need  = test[['patient_id', 'pathology', 'image file path', 'cropped image file path','ROI mask file path']]
 
 # Merge them together and reindex the output dataframe
 merged_df = pd.concat([train_need, test_need], axis=0)
@@ -183,13 +188,9 @@ def convert_dcm_to_png(source_folder, destination_root):
     })
 
 # Specify the source folder and destination folder, make sure they exist
-
-#-----------------------
-# Adjusted for cluster 
-#-----------------------
-
-source_folder = os.path.join(base_dir, "manifest-ZkhPvrLo5216730872708713142", "CBIS-DDSM")
-destination_root = os.path.join(base_dir, "roi_train")
+### >>> CLUSTER CHANGE:
+source_folder    = os.path.join(MANIFEST_DIR, "CBIS-DDSM")  # /data/ds340w/data/<manifest>/CBIS-DDSM
+destination_root = PNG_OUT_DIR                               # /data/ds340w/work/png
 
 # Call the functon to convert DICOM files to PNG and get the total number of failed conversions and DataFrame
 # The function will return the number of failed conversions and the paths of the images before and after conversion as well
@@ -216,14 +217,10 @@ def move_images(root_dir, dest_dir):
             shutil.move(source_path, dest_path)
             print(f"Moved: {source_path} -> {dest_path}")
 
-# Specify the root directory containing images and the destination directory
-
-#-----------------------
-# Adjusted for cluster 
-#-----------------------
-
-root_dir = destination_root
-dest_dir = os.path.join(base_dir, "roi_train_needed")
+### >>> CLUSTER CHANGE:
+root_dir = destination_root                                   # i.e., /data/ds340w/work/png
+dest_dir = os.path.join(WORK_DIR, "roi_train_needed")         # /data/ds340w/work/roi_train_needed
+os.makedirs(dest_dir, exist_ok=True)
 
 # Call the function to move images
 move_images(root_dir, dest_dir)

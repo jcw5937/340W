@@ -10,6 +10,13 @@ import re
 import pandas as pd
 from PIL import Image
 
+# >>> CLUSTER CHANGE: define cluster roots and ensure output dirs exist
+ROOT = "/data/ds340w"
+WORK_DIR = os.path.join(ROOT, "work")
+os.makedirs(WORK_DIR, exist_ok=True)
+OUT_DIR = os.path.join(WORK_DIR, "train_same_size")
+os.makedirs(OUT_DIR, exist_ok=True)
+
 ##################################################
 # Extract the image names of ROI and full images #
 ##################################################
@@ -40,19 +47,8 @@ def extract_names_from_folder(folder_path):
     return extracted_data
 
 # Specify the paths of the two folders to compare, feel free to edit the directory
-
-#####################
-# Added for Cluster #
-#####################
-
-BASE_DIR = "/data/ds340w"                   # cluster base directory
-WORK_DIR = os.path.join(BASE_DIR, "work")   # where your intermediate folders live
-
-folder1_path = os.path.join(WORK_DIR, "roi_train_needed")
+folder1_path = os.path.join(WORK_DIR, "roi_train_needed")      # ROI PNGs
 folder2_path = os.path.join(WORK_DIR, "full_train_needed")
-save_folder  = os.path.join(WORK_DIR, "train_same_size")
-
-os.makedirs(save_folder, exist_ok=True)     # ensure output folder exists exactly once
 
 # Extract data from both folders and convert them to dataframe
 data_in_folder1 = extract_names_from_folder(folder1_path)
@@ -73,9 +69,7 @@ mismated_info = []
 for index, row in common_data_df.iterrows():
     roi_path = row['path_ROI']
     full_path = row['path_Full']
-    if pd.isna(roi_path) or pd.isna(full_path): # added check for cluster
-        continue
-    name = os.path.basename(row['path_ROI']) # changed for cluster
+    name = row['path_ROI'].split('/')[-1]
     name = name.replace("_content_mass_test_failed_", "")
 
     # Open ROI and full images
@@ -90,10 +84,11 @@ for index, row in common_data_df.iterrows():
 print("All images successfully processed.")
 
 # Save mismated images information to CSV
+### >>> CLUSTER CHANGE: write CSV into WORK_DIR
 if mismated_info:
     df_mismated = pd.DataFrame(mismated_info, columns=['Image Name', 'Full Image Size', 'ROI Size'])
-    df_mismated.to_csv('mismated_image_info.csv', index=False)
-    print("Mismated images information saved to mismated_image_info.csv.")
+    df_mismated.to_csv(os.path.join(WORK_DIR, 'mismated_image_info.csv'), index=False)
+    print("Mismated images information saved to mismated_images_info.csv.")
 else:
     print("No mismated images found.")
 
@@ -105,9 +100,7 @@ else:
 for index, row in common_data_df.iterrows():
     roi_path = row['path_ROI']
     full_path = row['path_Full']
-    if pd.isna(roi_path) or pd.isna(full_path): # added check for cluster
-        continue
-    name = os.path.basename(row['path_ROI']) # Changed for cluster
+    name = row['path_ROI'].split('/')[-1]
     name = name.replace("_content_mass_test_failed_", "")
 
     # Open ROI and full images
@@ -143,7 +136,8 @@ for index, row in common_data_df.iterrows():
     full_image.paste(roi_image, mask_position, roi_image)
 
     # Prepare the save path with the corresponding number of underscores
-    save_path = os.path.join(save_folder, name)
+    ### >>> CLUSTER CHANGE: save into WORK_DIR/train_same_size
+    save_path = os.path.join(OUT_DIR, name)
 
     # Save the processed full image
     full_image.save(save_path)

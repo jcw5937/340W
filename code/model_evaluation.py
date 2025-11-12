@@ -7,7 +7,11 @@
 ################################
 
 # Install packages/hubs/ others needed
-pip install pydicom
+#pip install pydicom
+
+# Added to access weights on the cluster
+import os
+os.environ["TORCH_HOME"] = "/data/ds340w/work/torch_cache"
 
 # Load modules
 import os
@@ -133,11 +137,16 @@ class CustomModel(nn.Module):
 #         self.feature_extractor = nn.Sequential(*list(self.feature_extractor.children())[:-2])
 
 
-        # load resnet pretrained model - feel free to adjust based on your needs
-        self.feature_extractor = models.resnet50(weights=ResNet50_Weights.DEFAULT)
+        # 1) Build the architecture without trying to download anything
+        self.feature_extractor = models.resnet50(weights=None)
 
-          # Remove the last fully connected layer of ResNet-50
+        # 2) Load the exact state_dict from the local file you copied to the cluster
+        state = torch.load("/data/ds340w/work/torch_cache/hub/checkpoints/resnet50-11ad3fa6.pth", map_location="cpu")
+        self.feature_extractor.load_state_dict(state)
+
+        # 3) (unchanged) remove the last FC layer to expose 2048-d features
         self.feature_extractor = nn.Sequential(*list(self.feature_extractor.children())[:-1])
+
 
 #         self.feature_extractor = models.densenet121(weights=DenseNet121_Weights.DEFAULT)
         

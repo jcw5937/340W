@@ -38,7 +38,7 @@ dicom_data = pd.read_csv(os.path.join(WORK_DIR, 'all_mass_pathology.csv')) # cha
 
 # Read in the image path info
 # Specify the root path where the .png files are located
-jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented')
+jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented_fixed') # changed to correct for naming error
 
 
 # Function to get all .png file paths in a directory

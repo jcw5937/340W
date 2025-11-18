@@ -60,6 +60,25 @@ df = pd.DataFrame({'File_Paths': jpg_paths})
 df['ID1'] = df['File_Paths'].apply(lambda x: x.split('/')[-1] if len(x.split('/')) > 1 else '')
 dicom_data['ID1'] = dicom_data['image file path'].apply(lambda x: x.split('/')[-4] if len(x.split('/')) > 1 else '')
 
+################## Check - delete later
+
+print("Number of df rows:", len(df))
+print("Number of dicom rows:", len(dicom_data))
+
+# Test if ANY match exists
+any_match = False
+
+for _, row in dicom_data.iterrows():
+    mask = df['ID1'].astype(str).str.contains(str(row['ID1']), na=False)
+    if mask.any():
+        any_match = True
+        break
+
+print("Does ANY match exist between df['ID1'] and dicom_data['ID1']?:", any_match)
+
+
+#######################
+
 # Assuming unique_df and jpg_paths_df are your DataFrames
 for index, row in dicom_data.iterrows():
     # Check if 'image_file_path_first_part' is in 'image_file_path' of jpg_paths_df

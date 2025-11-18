@@ -60,6 +60,10 @@ df = pd.DataFrame({'File_Paths': jpg_paths})
 df['ID1'] = df['File_Paths'].apply(lambda x: x.split('/')[-1] if len(x.split('/')) > 1 else '')
 dicom_data['ID1'] = dicom_data['image file path'].apply(lambda x: x.split('/')[-4] if len(x.split('/')) > 1 else '')
 
+# Make sure these are strings so .str.contains works - Added for error in the cluster ****
+df['ID1'] = df['ID1'].astype(str)
+dicom_data['ID1'] = dicom_data['ID1'].astype(str)
+
 # Assuming unique_df and jpg_paths_df are your DataFrames
 for index, row in dicom_data.iterrows():
     # Check if 'image_file_path_first_part' is in 'image_file_path' of jpg_paths_df

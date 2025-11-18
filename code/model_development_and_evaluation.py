@@ -64,6 +64,8 @@ dicom_data['ID1'] = dicom_data['image file path'].apply(lambda x: x.split('/')[-
 for index, row in dicom_data.iterrows():
     # Check if 'image_file_path_first_part' is in 'image_file_path' of jpg_paths_df
     mask = df['ID1'].astype(str).str.contains(str(row['ID1']), na=False) # attempted cluster fix
+    if not mask.any():
+        continue
     # If there is a match, update 'pathology' in jpg_paths_df
     df.loc[mask, 'pathology'] = row['pathology']
     # df.loc[mask, 'full_image_name'] = row['image_file_path_first_part']

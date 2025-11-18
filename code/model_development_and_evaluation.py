@@ -261,14 +261,15 @@ def replicate_rows(df, n_replicates):
     return pd.DataFrame(new_rows)
 
 # Replicate each row 5 times with modified File_Paths
-train_data_augmented = replicate_rows(train_data, 5)
+# train_data_augmented = replicate_rows(train_data, 5) ********* took this out for cluster
 
 # Split the train set into train and validation sets
 val_data, test_data = train_test_split(temp_data, test_size=1/2)
 # val_data, test_data = train_test_split(temp_data, test_size=1/3, random_state=42)
 
 # Create datasets and dataloaders for train, validation, and test sets
-train_dataset_ = CustomDataset(train_data_augmented, transform=transform_)
+#train_dataset_ = CustomDataset(train_data_augmented, transform=transform_) #this line has been changed for the cluster:
+train_dataset_ = CustomDataset(train_data, transform=transform_)
 train_loader_ = DataLoader(train_dataset_, batch_size=32, shuffle=True)
 
 val_dataset = CustomDataset(val_data, transform=transform_)

@@ -38,8 +38,7 @@ dicom_data = pd.read_csv(os.path.join(WORK_DIR, 'all_mass_pathology.csv')) # cha
 
 # Read in the image path info
 # Specify the root path where the .png files are located
-jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented_fixed') # changed to correct for naming error
-
+jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented') 
 
 # Function to get all .png file paths in a directory
 def get_jpg_file_paths(directory):
@@ -82,9 +81,10 @@ print("Does ANY match exist between df['ID1'] and dicom_data['ID1']?:", any_matc
 # Assuming unique_df and jpg_paths_df are your DataFrames
 for index, row in dicom_data.iterrows():
     # Check if 'image_file_path_first_part' is in 'image_file_path' of jpg_paths_df
-    mask = df['ID1'].astype(str).str.contains(str(row['ID1']), na=False) # attempted cluster fix
-    if not mask.any():
-        continue
+    mask = df['ID1'].str.contains(row['ID1'])
+    #mask = df['ID1'].astype(str).str.contains(str(row['ID1']), na=False) # attempted cluster fix
+    #if not mask.any():
+    #    continue
     # If there is a match, update 'pathology' in jpg_paths_df
     df.loc[mask, 'pathology'] = row['pathology']
     # df.loc[mask, 'full_image_name'] = row['image_file_path_first_part']

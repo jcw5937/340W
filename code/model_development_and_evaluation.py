@@ -91,7 +91,7 @@ df['label'] = df['pathology'].map(label_mapping)
 # Get the images before augmentation
 def check_filename(filename):
     basename = os.path.basename(filename)
-    return basename.endswith('1-1.png') or basename.endswith('1-2.png')
+    return basename.endswith('1-1_1.png') or basename.endswith('1-2_1.png') # adjusted to match filenames on cluster
 
 # Apply the function to filter rows
 original_df = df[df['File_Paths'].apply(check_filename)]

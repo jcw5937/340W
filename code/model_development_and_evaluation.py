@@ -410,17 +410,28 @@ predicted_probs = np.array(predicted_probs)
 # Calculate predicted labels
 predicted_labels = (predicted_probs > 0.5).astype(int)
 
-# debugging print statements: ***********
-print("True label positive rate (malignant):", true_labels.mean())
-print("Predicted positive rate (malignant):", predicted_labels.mean())
-print("Min / Max predicted probability:", predicted_probs.min(), predicted_probs.max())
-
 # Calculate evaluation metrics
 accuracy = accuracy_score(true_labels, predicted_labels)
 precision = precision_score(true_labels, predicted_labels)
 recall = recall_score(true_labels, predicted_labels)
 f1 = f1_score(true_labels, predicted_labels)
 roc_auc = roc_auc_score(true_labels, predicted_probs)
+
+#different thresholds testing
+print("\n=== Threshold sweep (no bootstrap, quick view) ===")
+for thr in [0.30, 0.35, 0.40, 0.45, 0.50, 0.55, 0.60]:
+    thr_pred = (predicted_probs >= thr).astype(int)
+    acc_thr = accuracy_score(true_labels, thr_pred)
+    prec_thr = precision_score(true_labels, thr_pred, zero_division=0)
+    rec_thr = recall_score(true_labels, thr_pred, zero_division=0)
+    f1_thr = f1_score(true_labels, thr_pred, zero_division=0)
+    pos_rate = thr_pred.mean()
+    print(
+        f"thr={thr:.2f} | acc={acc_thr:.3f} "
+        f"prec={prec_thr:.3f} rec={rec_thr:.3f} f1={f1_thr:.3f} "
+        f"pos_rate={pos_rate:.3f}"
+    )
+
 
 # Print the evaluation metrics
 print(f"Accuracy: {accuracy:.4f}")

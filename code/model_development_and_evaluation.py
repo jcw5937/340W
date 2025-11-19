@@ -287,7 +287,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.00001) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.000006) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -320,6 +320,7 @@ for epoch in range(num_epochs):
 
         # Calculate accuracy
         predicted_labels = (outputs > 0.5).float()  # Threshold at 0.5 for binary classification
+        #predicted_labels = (outputs > 0.45).float() # trying a new threshold
         predicted_labels_int = predicted_labels.view(-1).long()
         total_correct += (predicted_labels_int == labels).sum().item()
         total_samples += labels.size(0)

@@ -227,7 +227,7 @@ class CustomDataset(Dataset):
 # Define the transformation pipeline - adjust based on which data you plan to use
 transform_ = transforms.Compose([
     transforms.ToTensor(),  # Convert PIL Image to tensor
-    transforms.Lambda(lambda x: x / 65535.0),  # Normalize tensor by dividing by 65535.0
+    #transforms.Lambda(lambda x: x / 65535.0),  # Normalize tensor by dividing by 65535.0 - trying taking this out
     # transforms.CenterCrop(299),
     # transforms.Resize((299, 299))  # Ensure the final size is 448x448
     # transforms.CenterCrop(448),  # Center crop the image to 448x448
@@ -407,6 +407,11 @@ predicted_probs = np.array(predicted_probs)
 
 # Calculate predicted labels
 predicted_labels = (predicted_probs > 0.5).astype(int)
+
+# debugging print statements: ***********
+print("True label positive rate (malignant):", true_labels.mean())
+print("Predicted positive rate (malignant):", predicted_labels.mean())
+print("Min / Max predicted probability:", predicted_probs.min(), predicted_probs.max())
 
 # Calculate evaluation metrics
 accuracy = accuracy_score(true_labels, predicted_labels)

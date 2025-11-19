@@ -287,7 +287,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.000006) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.000002) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -319,8 +319,8 @@ for epoch in range(num_epochs):
         running_loss += loss.item()
 
         # Calculate accuracy
-        predicted_labels = (outputs > 0.5).float()  # Threshold at 0.5 for binary classification
-        #predicted_labels = (outputs > 0.45).float() # trying a new threshold
+        #predicted_labels = (outputs > 0.5).float()  # Threshold at 0.5 for binary classification
+        predicted_labels = (outputs > 0.35).float() # trying a new threshold
         predicted_labels_int = predicted_labels.view(-1).long()
         total_correct += (predicted_labels_int == labels).sum().item()
         total_samples += labels.size(0)
@@ -611,7 +611,11 @@ for imgs, lbls in explain_loader:
     # For a single-output sigmoid model, shap_values returns a list with one array
     shap_vals = shap_vals_list[0]  # shape: [batch, 1, 224, 224]
 
-    all_shap_values.append(shap_vals.cpu().numpy())
+    # all_shap_values.append(shap_vals.cpu().numpy()) # this line fails do to a cpu error
+    if isinstance(shap_vals, torch.Tensor):
+        shap_vals = shap_vals.detach().cpu().numpy()
+    all_shap_values.append(shap_vals) 
+     
     all_images.append(imgs.cpu().numpy())
 
 all_shap_values = np.concatenate(all_shap_values, axis=0)  # [N, 1, 224, 224]

@@ -94,9 +94,9 @@ def check_filename(filename):
     return basename.endswith('1-1.png') or basename.endswith('1-2.png')
 
 # Apply the function to filter rows
-#original_df = df[df['File_Paths'].apply(check_filename)]
+original_df = df[df['File_Paths'].apply(check_filename)]
 # Trying a new thing on the cluster
-original_df = df  # use all images (original + augmented) on the cluster
+# original_df = df  # use all images (original + augmented) on the cluster
 
 
 ###################

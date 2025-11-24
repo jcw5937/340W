@@ -287,7 +287,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.000002) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.000004) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -347,7 +347,7 @@ for epoch in range(num_epochs):
             val_running_loss += val_loss.item()
 
             # Calculate accuracy
-            val_predicted_labels = (val_outputs > 0.5).float()  # Threshold at 0.5 for binary classification
+            val_predicted_labels = (val_outputs > 0.35).float()  # Threshold at 0.5 for binary classification
             val_predicted_labels_int = val_predicted_labels.view(-1).long()
             val_total_correct += (val_predicted_labels_int == val_labels).sum().item()
             val_total_samples += val_labels.size(0)
@@ -615,7 +615,7 @@ for imgs, lbls in explain_loader:
     if isinstance(shap_vals, torch.Tensor):
         shap_vals = shap_vals.detach().cpu().numpy()
     all_shap_values.append(shap_vals) 
-     
+
     all_images.append(imgs.cpu().numpy())
 
 all_shap_values = np.concatenate(all_shap_values, axis=0)  # [N, 1, 224, 224]
@@ -623,6 +623,13 @@ all_images      = np.concatenate(all_images, axis=0)       # [N, 1, 224, 224]
 
 print(f"SHAP values shape: {all_shap_values.shape}")
 print(f"Image batch shape: {all_images.shape}")
+
+print(f"SHAP values shape: {all_shap_values.shape}")
+print(f"Image batch shape: {all_images.shape}")
+print("SHAP ndim:", all_shap_values.ndim)
+print("Image ndim:", all_images.ndim)
+print("Example SHAP[0] shape:", all_shap_values[0].shape)
+print("Example IMG[0] shape:", all_images[0].shape)
 
 # ---- 5) Save a few overlay plots to disk ----
 print("=== Saving SHAP overlay images ===")

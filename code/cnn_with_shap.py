@@ -38,8 +38,8 @@ dicom_data = pd.read_csv(os.path.join(WORK_DIR, 'all_mass_pathology.csv')) # cha
 
 # Read in the image path info
 # Specify the root path where the .png files are located
-# jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented') 
-jpg_root_path = os.path.join(WORK_DIR, 'train_598')
+jpg_root_path = os.path.join(WORK_DIR, 'train_598_augmented') 
+# jpg_root_path = os.path.join(WORK_DIR, 'train_598_aug_v2')
 
 ######################################################################################################
 # removing augmentation because of the errors  #######################################################
@@ -571,7 +571,7 @@ plt.show()
 # INNOVATION: SHAP explanations #
 #################################
 
-import shap  # make sure to pip install shap on teh cluster
+import shap
 
 # Ensure model is in eval mode and on the right device
 model.eval()
@@ -579,8 +579,7 @@ model.to(device)
 
 print("\n=== Building SHAP background set ===")
 
-# ---- 1) Build a small background set from training data ----
-# Use up to 50 training images as background
+# ---- 1) Background set (same as before) ----
 bg_n = min(50, len(train_data))
 background_df = train_data.sample(n=bg_n, random_state=0).reset_index(drop=True)
 
@@ -591,86 +590,87 @@ background_batches = []
 for imgs, _ in background_loader:
     background_batches.append(imgs.to(device))
 
-background = torch.cat(background_batches, dim=0)  # shape: [bg_n, 1, 224, 224]
+background = torch.cat(background_batches, dim=0)
 print(f"Background tensor shape: {background.shape}")
 
-# ---- 2) Pick some test images to explain (20 malignant, 20 benign if possible) ----
+
+# ---- 2) Select a small, balanced explanation set ----
 print("=== Building explanation set from test_data ===")
 
-malignant_df = test_data[test_data['label'] == 1].head(20)
-benign_df    = test_data[test_data['label'] == 0].head(20)
-explain_df   = pd.concat([malignant_df, benign_df], ignore_index=True)
+max_per_class = 10   # 10 malignant + 10 benign = 20 total
+
+malignant_df = test_data[test_data['label'] == 1].head(max_per_class)
+benign_df    = test_data[test_data['label'] == 0].head(max_per_class)
+
+explain_df = pd.concat([malignant_df, benign_df], ignore_index=True)
+explain_df = explain_df.sample(frac=1, random_state=1).reset_index(drop=True)
 
 print(f"Number of images selected for explanation: {len(explain_df)}")
+
 
 explain_dataset = CustomDataset(explain_df, transform=transform_)
 explain_loader  = DataLoader(explain_dataset, batch_size=8, shuffle=False)
 
-# ---- 3) Create GradientExplainer ----
+
+# ---- 3) Create SHAP explainer ----
 print("=== Initializing SHAP GradientExplainer ===")
 explainer = shap.GradientExplainer(model, background)
 
-# ---- 4) Compute SHAP values for the explanation set ----
-print("=== Computing SHAP values (this can take a few minutes) ===")
+
+# ---- 4) Compute SHAP values ----
+print("=== Computing SHAP values ===")
 
 all_shap_values = []
 all_images = []
 
-for imgs, lbls in explain_loader:
-    imgs = imgs.to(device)
-    shap_vals_list = explainer.shap_values(imgs)
-    # For a single-output sigmoid model, shap_values returns a list with one array
-    shap_vals = shap_vals_list[0]  # shape: [batch, 1, 224, 224]
+for imgs, _ in explain_loader:
+    imgs_gpu = imgs.to(device)
 
-    # all_shap_values.append(shap_vals.cpu().numpy()) # this line fails do to a cpu error
+    shap_vals_list = explainer.shap_values(imgs_gpu)
+    shap_vals = shap_vals_list[0]  # [batch, 1, 224, 224]
+
     if isinstance(shap_vals, torch.Tensor):
         shap_vals = shap_vals.detach().cpu().numpy()
-    all_shap_values.append(shap_vals) 
 
+    all_shap_values.append(shap_vals)
     all_images.append(imgs.cpu().numpy())
 
-all_shap_values = np.concatenate(all_shap_values, axis=0)  # [N, 1, 224, 224]
-all_images      = np.concatenate(all_images, axis=0)       # [N, 1, 224, 224]
+all_shap_values = np.concatenate(all_shap_values, axis=0)
+all_images      = np.concatenate(all_images, axis=0)
 
 print(f"SHAP values shape: {all_shap_values.shape}")
 print(f"Image batch shape: {all_images.shape}")
 
-print(f"SHAP values shape: {all_shap_values.shape}")
-print(f"Image batch shape: {all_images.shape}")
-print("SHAP ndim:", all_shap_values.ndim)
-print("Image ndim:", all_images.ndim)
-print("Example SHAP[0] shape:", all_shap_values[0].shape)
-print("Example IMG[0] shape:", all_images[0].shape)
 
-# ---- 5) Save a few overlay plots to disk ----
+# ---- 5) Save SHAP overlays ----
 print("=== Saving SHAP overlay images ===")
 
 output_dir = os.path.join(WORK_DIR, "shap_outputs")
 os.makedirs(output_dir, exist_ok=True)
 
-# Only save as many as we actually have SHAP values for
-num_to_save = min(10, all_images.shape[0], all_shap_values.shape[0])
+num_to_save = min(20, all_images.shape[0], all_shap_values.shape[0])
 print(f"Saving {num_to_save} SHAP examples")
 
 for i in range(num_to_save):
-    # all_images: (40, 1, 224, 224) -> take channel 0 -> (224, 224)
-    img = all_images[i, 0, :, :]
+    img = all_images[i, 0, :, :]  # grayscale
 
-    # all_shap_values: (5, 224, 224, 1) -> take channel 0 -> (224, 224)
-    smap = all_shap_values[i, :, :, 0]
+    # Normalize image for correct visualization
+    img_norm = (img - img.min()) / (img.max() - img.min() + 1e-8)
+
+    smap = all_shap_values[i, 0, :, :]  # SHAP map [224×224]
 
     plt.figure(figsize=(6, 3))
 
-    # Original image
+    # Original
     plt.subplot(1, 2, 1)
-    plt.imshow(img, cmap="gray", aspect="equal")
+    plt.imshow(img_norm, cmap="gray", aspect="equal")
     plt.axis("off")
     plt.title("Original")
 
     # SHAP overlay
     plt.subplot(1, 2, 2)
-    plt.imshow(img, cmap="gray", aspect="equal")
-    plt.imshow(smap, cmap="jet", alpha=0.5, aspect="equal")
+    plt.imshow(img_norm, cmap="gray", aspect="equal")
+    plt.imshow(smap, cmap="jet", alpha=0.5)
     plt.axis("off")
     plt.title("SHAP overlay")
 
@@ -680,6 +680,5 @@ for i in range(num_to_save):
     plt.close()
 
     print(f"Saved {out_path}")
-
 
 print("=== SHAP explanation generation finished ===")

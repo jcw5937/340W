@@ -605,8 +605,8 @@ print(f"Background tensor shape: {background.shape}")
 print("=== Building explanation set from test_data ===")
 
 
-malignant_df = test_data[test_data['label'] == 1].head(20)
-benign_df    = test_data[test_data['label'] == 0].head(20)
+malignant_df = test_data[test_data['label'] == 1].sample(20)
+benign_df    = test_data[test_data['label'] == 0].sample(20)
 explain_df   = pd.concat([malignant_df, benign_df], ignore_index=True)
 
 

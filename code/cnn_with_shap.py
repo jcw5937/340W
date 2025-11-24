@@ -358,7 +358,7 @@ for epoch in range(num_epochs):
             val_running_loss += val_loss.item()
 
             # Calculate accuracy
-            val_predicted_labels = (val_outputs > 0.35).float()  # Threshold at 0.5 for binary classification
+            val_predicted_labels = (val_outputs > 0.45).float()  # Threshold at 0.5 for binary classification
             val_predicted_labels_int = val_predicted_labels.view(-1).long()
             val_total_correct += (val_predicted_labels_int == val_labels).sum().item()
             val_total_samples += val_labels.size(0)
@@ -419,7 +419,7 @@ true_labels = np.array(true_labels)
 predicted_probs = np.array(predicted_probs)
 
 # Calculate predicted labels
-predicted_labels = (predicted_probs > 0.35).astype(int)
+predicted_labels = (predicted_probs > 0.45).astype(int)
 
 # Calculate evaluation metrics
 accuracy = accuracy_score(true_labels, predicted_labels)

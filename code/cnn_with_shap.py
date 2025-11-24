@@ -238,9 +238,14 @@ transform_ = transforms.Compose([
 ])
 from sklearn.model_selection import train_test_split
 
+# random.seed(0)
+# np.random.seed(0)
+# torch.manual_seed(0)
+# torch.cuda.manual_seed_all(0)
+
 # Split the dataset into train and test sets, get all the images for training
-train_data, temp_data = train_test_split(original_df, test_size=0.2)
-# train_data, temp_data = train_test_split(original_df, test_size=0.2, random_state=42)
+#train_data, temp_data = train_test_split(original_df, test_size=0.2)
+train_data, temp_data = train_test_split(original_df, test_size=0.2, random_state=42)
 # Function to replicate rows and modify File_Paths
 def replicate_rows(df, n_replicates):
     # Create an empty list to collect new rows
@@ -264,8 +269,8 @@ def replicate_rows(df, n_replicates):
 # train_data_augmented = replicate_rows(train_data, 5) ********* took this out for cluster
 
 # Split the train set into train and validation sets
-val_data, test_data = train_test_split(temp_data, test_size=1/2)
-# val_data, test_data = train_test_split(temp_data, test_size=1/3, random_state=42)
+# val_data, test_data = train_test_split(temp_data, test_size=1/2)
+val_data, test_data = train_test_split(temp_data, test_size=1/3, random_state=42)
 
 # Create datasets and dataloaders for train, validation, and test sets
 #train_dataset_ = CustomDataset(train_data_augmented, transform=transform_) #this line has been changed for the cluster:
@@ -287,7 +292,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.000006) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.000004) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -408,7 +413,7 @@ true_labels = np.array(true_labels)
 predicted_probs = np.array(predicted_probs)
 
 # Calculate predicted labels
-predicted_labels = (predicted_probs > 0.5).astype(int)
+predicted_labels = (predicted_probs > 0.35).astype(int)
 
 # Calculate evaluation metrics
 accuracy = accuracy_score(true_labels, predicted_labels)
@@ -637,23 +642,29 @@ print("=== Saving SHAP overlay images ===")
 output_dir = os.path.join(WORK_DIR, "shap_outputs")
 os.makedirs(output_dir, exist_ok=True)
 
-num_to_save = min(10, all_images.shape[0])  # save first 10 examples
+# Only save as many as we actually have SHAP values for
+num_to_save = min(10, all_images.shape[0], all_shap_values.shape[0])
+print(f"Saving {num_to_save} SHAP examples")
+
 for i in range(num_to_save):
-    img  = all_images[i, 0, :, :]          # take the single channel
-    smap = all_shap_values[i, 0, :, :]     # SHAP map for that image
+    # all_images: (40, 1, 224, 224) -> take channel 0 -> (224, 224)
+    img = all_images[i, 0, :, :]
+
+    # all_shap_values: (5, 224, 224, 1) -> take channel 0 -> (224, 224)
+    smap = all_shap_values[i, :, :, 0]
 
     plt.figure(figsize=(6, 3))
 
     # Original image
     plt.subplot(1, 2, 1)
-    plt.imshow(img, cmap="gray")
+    plt.imshow(img, cmap="gray", aspect="equal")
     plt.axis("off")
     plt.title("Original")
 
     # SHAP overlay
     plt.subplot(1, 2, 2)
-    plt.imshow(img, cmap="gray")
-    plt.imshow(smap, cmap="jet", alpha=0.5)
+    plt.imshow(img, cmap="gray", aspect="equal")
+    plt.imshow(smap, cmap="jet", alpha=0.5, aspect="equal")
     plt.axis("off")
     plt.title("SHAP overlay")
 
@@ -663,5 +674,6 @@ for i in range(num_to_save):
     plt.close()
 
     print(f"Saved {out_path}")
+
 
 print("=== SHAP explanation generation finished ===")

@@ -2,7 +2,7 @@ import os
 from PIL import Image
 import matplotlib.pyplot as plt
 
-RAW_DIR = "/data/ds340w/work/train_598_augmented"
+RAW_DIR = "/data/ds340w/work/train_598"
 OUT_DIR = "/data/ds340w/work/debug_raw"
 os.makedirs(OUT_DIR, exist_ok=True)
 

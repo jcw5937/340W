@@ -2,10 +2,9 @@ import os
 import pydicom
 import matplotlib.pyplot as plt
 
-# adjust this once you see what's inside manifest-...
 ROOT = "/data/ds340w/data/manifest-ZkhPvrLo5216730872708713142"
 
-# find one DICOM file
+# find first DICOM
 dcm_path = None
 for dirpath, dirnames, filenames in os.walk(ROOT):
     for f in filenames:
@@ -17,11 +16,14 @@ for dirpath, dirnames, filenames in os.walk(ROOT):
 
 print("Using DICOM:", dcm_path)
 
+# load dicom
 ds = pydicom.dcmread(dcm_path)
 img = ds.pixel_array
 
+# save PNG version so you can inspect it
+out_path = "/data/ds340w/work/debug_raw/dicom_example.png"
+
 plt.imshow(img, cmap="gray")
 plt.axis("off")
-plt.title("Raw DICOM example")
-plt.savefig("/data/ds340w/work/debug_raw/dicom_example.png", dpi=200)
-plt.close()
+plt.savefig(out_path, dpi=200)
+print("Saved:", out_path)

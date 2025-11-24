@@ -599,8 +599,8 @@ print("=== Building explanation set from test_data ===")
 
 max_per_class = 10   # 10 malignant + 10 benign = 20 total
 
-malignant_df = test_data[test_data['label'] == 1].head(max_per_class)
-benign_df    = test_data[test_data['label'] == 0].head(max_per_class)
+malignant_df = test_data[test_data['label'] == 1].sample(max_per_class)
+benign_df    = test_data[test_data['label'] == 0].sample(max_per_class)
 
 explain_df = pd.concat([malignant_df, benign_df], ignore_index=True)
 explain_df = explain_df.sample(frac=1, random_state=1).reset_index(drop=True)

@@ -233,12 +233,12 @@ class CustomDataset(Dataset):
 # Define the transformation pipeline - adjust based on which data you plan to use
 transform_ = transforms.Compose([
     transforms.ToTensor(),  # Convert PIL Image to tensor
-    #transforms.Lambda(lambda x: x / 65535.0),  # Normalize tensor by dividing by 65535.0 - trying taking this out
+    # transforms.Lambda(lambda x: x / 65535.0),  # Normalize tensor by dividing by 65535.0 - trying taking this out
     # transforms.CenterCrop(299),
-    # transforms.Resize((299, 299))  # Ensure the final size is 448x448
+    # transforms.Resize((299, 299)),  # Ensure the final size is 448x448
     # transforms.CenterCrop(448),  # Center crop the image to 448x448
     # transforms.Resize((448, 448))  # Ensure the final size is 448x448
-    transforms.CenterCrop(224),
+    # transforms.CenterCrop(224),
     transforms.Resize((224, 224))  # Ensure the final size is 448x448
 
 ])

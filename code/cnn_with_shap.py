@@ -331,7 +331,7 @@ for epoch in range(num_epochs):
 
         # Calculate accuracy
         #predicted_labels = (outputs > 0.5).float()  # Threshold at 0.5 for binary classification
-        predicted_labels = (outputs > 0.35).float() # trying a new threshold
+        predicted_labels = (outputs > 0.45).float() # trying a new threshold
         predicted_labels_int = predicted_labels.view(-1).long()
         total_correct += (predicted_labels_int == labels).sum().item()
         total_samples += labels.size(0)
@@ -681,3 +681,55 @@ for i in range(num_to_save):
    print(f"Saved {out_path}")
 
 print("=== SHAP explanation generation finished ===")
+
+
+###########################################
+# Extra: SHAP overlay on ORIGINAL images  #
+###########################################
+
+import torch.nn.functional as F  # safe even if already imported
+
+# How many examples to save
+num_to_save_full = min(10, all_images.shape[0], all_shap_values.shape[0])
+print(f"Saving {num_to_save_full} SHAP overlays on ORIGINAL images")
+
+for i in range(num_to_save_full):
+    # 1) Original (pre-transform) image path
+    orig_path = explain_df.iloc[i]['File_Paths']
+    full_img_pil = Image.open(orig_path).convert("L")
+    full_img = np.array(full_img_pil, dtype=np.float32)   # shape (H, W)
+
+    # 2) SHAP map for this example (224×224)
+    shap_map = all_shap_values[i, :, :, 0]                # (224, 224)
+
+    # 3) Resize SHAP map up to the original image size
+    shap_tensor = torch.from_numpy(shap_map[None, None, :, :])   # [1,1,224,224]
+    shap_resized = F.interpolate(
+        shap_tensor,
+        size=full_img.shape,        # (H, W)
+        mode="bilinear",
+        align_corners=False
+    )[0, 0].numpy()                 # back to (H, W)
+
+    # 4) Plot: original + SHAP on original
+    plt.figure(figsize=(6, 3))
+
+    # Left: original image
+    plt.subplot(1, 2, 1)
+    plt.imshow(full_img, cmap="gray", aspect="equal")
+    plt.axis("off")
+    plt.title("Original mammogram")
+
+    # Right: SHAP overlay on original
+    plt.subplot(1, 2, 2)
+    plt.imshow(full_img, cmap="gray", aspect="equal")
+    plt.imshow(shap_resized, cmap="jet", alpha=0.5, aspect="equal")
+    plt.axis("off")
+    plt.title("SHAP overlay (full)")
+
+    plt.tight_layout()
+    full_out_path = os.path.join(output_dir, f"shap_full_example_{i:02d}.png")
+    plt.savefig(full_out_path, dpi=200)
+    plt.close()
+
+    print(f"Saved {full_out_path}")

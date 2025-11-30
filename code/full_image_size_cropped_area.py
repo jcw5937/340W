@@ -21,7 +21,7 @@ WORK_DIR = os.path.join(BASE_DIR, "work")
 # -------- TESTING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
     # Pattern for test images
-    pattern = r'(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)'
+    pattern = r'(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO).*'
     match = re.search(pattern, image_path)
 
     if match:
@@ -69,7 +69,7 @@ print("Done for testing images")
 
 # -------- TRAINING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
-    pattern = r'(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)'
+    pattern = r'(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO).*'
     match = re.search(pattern, image_path)
 
     if match:

@@ -21,7 +21,7 @@ WORK_DIR = os.path.join(BASE_DIR, "work")
 # -------- TESTING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
     # Pattern for test images — now keeps ROI suffix (like _1, _1__1-1)
-    pattern = r'.*(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?'
+    pattern = r'.*(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?\.png'
     match = re.search(pattern, image_path)
 
     if match:
@@ -71,7 +71,7 @@ print("Done for testing images")
 # -------- TRAINING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
     # Same fix for training images
-    pattern = r'.*(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?'
+    pattern = r'.*(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?\.png'
     match = re.search(pattern, image_path)
 
     if match:

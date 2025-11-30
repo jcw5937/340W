@@ -20,8 +20,8 @@ WORK_DIR = os.path.join(BASE_DIR, "work")
 
 # -------- TESTING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
-    # Pattern for test images
-    pattern = r'(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO).*'
+    # Pattern for test images — now keeps ROI suffix (like _1, _1__1-1)
+    pattern = r'(Mass|Calc)-Test_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?'
     match = re.search(pattern, image_path)
 
     if match:
@@ -29,8 +29,9 @@ def process_image_and_extract_groups(image_path):
         number       = match.group(2)
         left         = match.group(3)
         cc           = match.group(4)
+        suffix       = match.group(5) if match.group(5) else ""
 
-        result = f"{mass_or_calc}-Test_P_{number}_{left}_{cc}"
+        result = f"{mass_or_calc}-Test_P_{number}_{left}_{cc}{suffix}"
 
         image = Image.open(image_path)
         image_array = np.array(image)
@@ -69,7 +70,8 @@ print("Done for testing images")
 
 # -------- TRAINING IMAGES -------- #
 def process_image_and_extract_groups(image_path):
-    pattern = r'(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO).*'
+    # Same fix for training images
+    pattern = r'(Mass|Calc)-Training_P_(\d+)_(LEFT|RIGHT)_(CC|MLO)(_[^\.]+)?'
     match = re.search(pattern, image_path)
 
     if match:
@@ -77,8 +79,9 @@ def process_image_and_extract_groups(image_path):
         number       = match.group(2)
         left         = match.group(3)
         cc           = match.group(4)
+        suffix       = match.group(5) if match.group(5) else ""
 
-        result = f"{mass_or_calc}-Training_P_{number}_{left}_{cc}"
+        result = f"{mass_or_calc}-Training_P_{number}_{left}_{cc}{suffix}"
 
         image = Image.open(image_path)
         image_array = np.array(image)

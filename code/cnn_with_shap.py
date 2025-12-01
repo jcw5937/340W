@@ -298,7 +298,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.000003) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.0000035) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")

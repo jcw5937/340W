@@ -298,7 +298,7 @@ import torch.optim as optim
 # Define loss function and optimizer
 criterion = nn.BCELoss()  # Use binary cross-entropy loss function since the labels are binary
 # optimizer = optim.Adam(model.parameters(), lr=0.000003)  # Adjust the learning rate based on your needed
-optimizer = optim.Adam(model.parameters(), lr=0.000004) # new learning rate attempts
+optimizer = optim.Adam(model.parameters(), lr=0.000003) # new learning rate attempts
 
 # Move the model and data to the GPU if available
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -581,37 +581,82 @@ plt.savefig('roc_curve.pdf', dpi=1000)
 plt.show()
 
 ############################################
-# Plot Training Curves
+# Plot Training Curves (Styled, 2-Panel)   #
 ############################################
-import matplotlib.pyplot as plt
 import numpy as np
-import os
+import matplotlib.pyplot as plt
 
-epochs = np.arange(1, len(train_losses)+1)
+# Epoch index (1, 2, ..., num_epochs)
+epochs = np.arange(1, len(train_losses) + 1)
 
-plt.figure(figsize=(12, 5))
+# --- Smooth polynomial fits (degree 2) ---
+x_fit = np.linspace(1, len(train_losses), 200)
 
-# -------- Left: LOSS --------
-plt.subplot(1, 2, 1)
-plt.plot(epochs, train_losses, "o", label="Training Loss")
-plt.plot(epochs, val_losses, "x", label="Validation Loss")
-plt.xlabel("Epoch")
-plt.ylabel("Loss")
-plt.legend()
-plt.title("Training and Validation Loss")
+train_loss_fit = np.polyval(np.polyfit(epochs, train_losses, deg=2), x_fit)
+val_loss_fit   = np.polyval(np.polyfit(epochs, val_losses,   deg=2), x_fit)
+train_acc_fit  = np.polyval(np.polyfit(epochs, train_accs,   deg=2), x_fit)
+val_acc_fit    = np.polyval(np.polyfit(epochs, val_accs,     deg=2), x_fit)
 
-# -------- Right: ACCURACY --------
-plt.subplot(1, 2, 2)
-plt.plot(epochs, train_accs, "o", label="Training Accuracy")
-plt.plot(epochs, val_accs, "x", label="Validation Accuracy")
-plt.xlabel("Epoch")
-plt.ylabel("Accuracy")
-plt.legend()
-plt.title("Training and Validation Accuracy")
+# --- Epoch markers ---
+best_epoch = int(np.argmax(val_accs) + 1)     # best validation accuracy
+early_stop_epoch = len(train_losses)          # last epoch actually trained
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5), sharex=True)
+
+# ========================
+# Left panel: LOSS curves
+# ========================
+ax1.scatter(epochs, train_losses, marker="o", label="Training Loss")
+ax1.scatter(epochs, val_losses,   marker="x", label="Validation Loss")
+
+ax1.plot(x_fit, train_loss_fit, "b--", label="Train Loss Fit")
+ax1.plot(x_fit, val_loss_fit,   "r--", label="Validation Loss Fit")
+
+# Vertical lines
+ax1.axvline(best_epoch, color="red",  linestyle="--",
+            label=f"Selected Checkpoint (Epoch {best_epoch})")
+ax1.axvline(early_stop_epoch, color="blue", linestyle="-",
+            label=f"End of Training (Epoch {early_stop_epoch})")
+
+ax1.set_xlabel("Epoch")
+ax1.set_ylabel("Loss")
+ax1.set_title("Training and Validation Loss over Epochs\nResNet-50 - 224 × 224")
+ax1.grid(True, linestyle=":", alpha=0.5)
+
+# Only show unique legend entries
+handles1, labels1 = ax1.get_legend_handles_labels()
+by_label1 = dict(zip(labels1, handles1))
+ax1.legend(by_label1.values(), by_label1.keys(), fontsize=8, loc="best")
+
+# ============================
+# Right panel: ACCURACY curves
+# ============================
+ax2.scatter(epochs, train_accs, marker="o", label="Training Accuracy")
+ax2.scatter(epochs, val_accs,   marker="x", label="Validation Accuracy")
+
+ax2.plot(x_fit, train_acc_fit, "b--", label="Train Accuracy Fit")
+ax2.plot(x_fit, val_acc_fit,   "r--", label="Validation Accuracy Fit")
+
+ax2.axvline(best_epoch, color="red",  linestyle="--",
+            label=f"Selected Checkpoint (Epoch {best_epoch})")
+ax2.axvline(early_stop_epoch, color="blue", linestyle="-",
+            label=f"End of Training (Epoch {early_stop_epoch})")
+
+ax2.set_xlabel("Epoch")
+ax2.set_ylabel("Accuracy")
+ax2.set_title("Training and Validation Accuracy over Epochs\nResNet-50 - 224 × 224")
+ax2.grid(True, linestyle=":", alpha=0.5)
+
+handles2, labels2 = ax2.get_legend_handles_labels()
+by_label2 = dict(zip(labels2, handles2))
+ax2.legend(by_label2.values(), by_label2.keys(), fontsize=8, loc="best")
 
 plt.tight_layout()
-plt.savefig(os.path.join(WORK_DIR, "training_curves.png"))
-print("Saved training curves to:", os.path.join(WORK_DIR, "training_curves.png"))
+
+curves_path = os.path.join(WORK_DIR, "training_curves_styled.png")
+plt.savefig(curves_path, dpi=300, bbox_inches="tight")
+plt.close()
+print("Saved styled training curves to:", curves_path)
 
 #################################
 # INNOVATION: SHAP explanations #

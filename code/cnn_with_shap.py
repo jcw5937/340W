@@ -337,7 +337,7 @@ for epoch in range(num_epochs):
 
         # Calculate accuracy
         #predicted_labels = (outputs > 0.5).float()  # Threshold at 0.5 for binary classification
-        predicted_labels = (outputs > 0.45).float() # trying a new threshold
+        predicted_labels = (outputs > 0.35).float() # trying a new threshold
         predicted_labels_int = predicted_labels.view(-1).long()
         total_correct += (predicted_labels_int == labels).sum().item()
         total_samples += labels.size(0)
@@ -367,7 +367,7 @@ for epoch in range(num_epochs):
             val_running_loss += val_loss.item()
 
             # Calculate accuracy
-            val_predicted_labels = (val_outputs > 0.45).float()  # Threshold at 0.5 for binary classification
+            val_predicted_labels = (val_outputs > 0.35).float()  # Threshold at 0.5 for binary classification
             val_predicted_labels_int = val_predicted_labels.view(-1).long()
             val_total_correct += (val_predicted_labels_int == val_labels).sum().item()
             val_total_samples += val_labels.size(0)

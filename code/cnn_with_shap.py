@@ -306,6 +306,12 @@ model.to(device)
 
 num_epochs = 20 # It could be increases based on your model's performance
 
+# ===== Track Training Metrics =====
+train_losses = []
+val_losses = []
+train_accs = []
+val_accs = []
+
 for epoch in range(num_epochs):
     model.train()  # Set the model to train mode
     running_loss = 0.0
@@ -339,6 +345,9 @@ for epoch in range(num_epochs):
     # Calculate accuracy and loss for training set
     train_accuracy = total_correct / total_samples
     train_loss = running_loss / len(train_loader_)
+    # Save epoch metrics
+    train_losses.append(train_loss)
+    train_accs.append(train_accuracy)
     
     # Validation
     model.eval()  # Set the model to evaluation mode
@@ -366,6 +375,10 @@ for epoch in range(num_epochs):
     # Calculate accuracy and loss for validation set
     val_accuracy = val_total_correct / val_total_samples
     val_loss = val_running_loss / len(val_loader)
+
+    # Save epoch metrics
+    val_losses.append(val_loss)
+    val_accs.append(val_accuracy)
 
     # Print the training and validation results for each epoch
     print(f"Epoch [{epoch+1}/{num_epochs}], Training Accuracy: {train_accuracy:.4f}, Validation Accuracy: {val_accuracy:.4f}")
@@ -567,6 +580,39 @@ plt.legend(loc="lower right")
 plt.savefig('roc_curve.pdf', dpi=1000)
 plt.show()
 
+############################################
+# Plot Training Curves
+############################################
+import matplotlib.pyplot as plt
+import numpy as np
+import os
+
+epochs = np.arange(1, len(train_losses)+1)
+
+plt.figure(figsize=(12, 5))
+
+# -------- Left: LOSS --------
+plt.subplot(1, 2, 1)
+plt.plot(epochs, train_losses, "o", label="Training Loss")
+plt.plot(epochs, val_losses, "x", label="Validation Loss")
+plt.xlabel("Epoch")
+plt.ylabel("Loss")
+plt.legend()
+plt.title("Training and Validation Loss")
+
+# -------- Right: ACCURACY --------
+plt.subplot(1, 2, 2)
+plt.plot(epochs, train_accs, "o", label="Training Accuracy")
+plt.plot(epochs, val_accs, "x", label="Validation Accuracy")
+plt.xlabel("Epoch")
+plt.ylabel("Accuracy")
+plt.legend()
+plt.title("Training and Validation Accuracy")
+
+plt.tight_layout()
+plt.savefig(os.path.join(WORK_DIR, "training_curves.png"))
+print("Saved training curves to:", os.path.join(WORK_DIR, "training_curves.png"))
+
 #################################
 # INNOVATION: SHAP explanations #
 #################################
@@ -594,7 +640,7 @@ for imgs, _ in background_loader:
 background = torch.cat(background_batches, dim=0)  # shape: [bg_n, 1, 224, 224]
 print(f"Background tensor shape: {background.shape}")
 
-# ---- 2) Pick some test images to explain (20 malignant, 20 benign if possible) ----
+# ---- 2) Pick some test images to explain----
 print("=== Building explanation set from test_data ===")
 
 malignant_df = df[df['label'] == 1].sample(40, random_state=None)
@@ -682,54 +728,3 @@ for i in range(num_to_save):
 
 print("=== SHAP explanation generation finished ===")
 
-
-###########################################
-# Extra: SHAP overlay on ORIGINAL images  #
-###########################################
-
-import torch.nn.functional as F  # safe even if already imported
-
-# How many examples to save
-num_to_save_full = min(10, all_images.shape[0], all_shap_values.shape[0])
-print(f"Saving {num_to_save_full} SHAP overlays on ORIGINAL images")
-
-for i in range(num_to_save_full):
-    # 1) Original (pre-transform) image path
-    orig_path = explain_df.iloc[i]['File_Paths']
-    full_img_pil = Image.open(orig_path).convert("L")
-    full_img = np.array(full_img_pil, dtype=np.float32)   # shape (H, W)
-
-    # 2) SHAP map for this example (224×224)
-    shap_map = all_shap_values[i, :, :, 0]                # (224, 224)
-
-    # 3) Resize SHAP map up to the original image size
-    shap_tensor = torch.from_numpy(shap_map[None, None, :, :])   # [1,1,224,224]
-    shap_resized = F.interpolate(
-        shap_tensor,
-        size=full_img.shape,        # (H, W)
-        mode="bilinear",
-        align_corners=False
-    )[0, 0].numpy()                 # back to (H, W)
-
-    # 4) Plot: original + SHAP on original
-    plt.figure(figsize=(6, 3))
-
-    # Left: original image
-    plt.subplot(1, 2, 1)
-    plt.imshow(full_img, cmap="gray", aspect="equal")
-    plt.axis("off")
-    plt.title("Original mammogram")
-
-    # Right: SHAP overlay on original
-    plt.subplot(1, 2, 2)
-    plt.imshow(full_img, cmap="gray", aspect="equal")
-    plt.imshow(shap_resized, cmap="jet", alpha=0.5, aspect="equal")
-    plt.axis("off")
-    plt.title("SHAP overlay (full)")
-
-    plt.tight_layout()
-    full_out_path = os.path.join(output_dir, f"shap_full_example_{i:02d}.png")
-    plt.savefig(full_out_path, dpi=200)
-    plt.close()
-
-    print(f"Saved {full_out_path}")

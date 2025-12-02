@@ -6,7 +6,11 @@ Publication can be accessed from [here]( https://www.nature.com/articles/s41598-
 
 The following is from the repository of the original paper which this project builds on: https://pmc.ncbi.nlm.nih.gov/articles/PMC11549440/pdf/41598_2024_Article_78648.pdf 
 
-Some additional code documents were added which were needed adapt the pipeline to fit a cluster environment. The original documents were updated and still retain the same order.
+Some additional code documents were added which were needed to adapt the pipeline to fit a cluster environment. These have been added to the steps section.
+
+## Innovation:
+
+Our innovation was SHAP (SHapley Additive exPlanations), is an interpretability method that uses a heatmap to display which parts of the processed images were used in classification. The SHAP model was added to the model_development_and_evaluation.py file and the updated name is cnn_with_shap.py.
 
 ## Overview
 
@@ -35,19 +39,14 @@ In general, our methods include: 1) converting DICOM to PNG format without alter
 Steps to run the code we provided for model development:
 
 1. Convert_DICOM_to_PNG.py
-2. Map_ROI_to_Full_Images.py
-3. Cropping.py
-4. Remove_white_edges.py
+2. Convert_DICOM_to_PNG_full.py
+3. Map_ROI_to_Full_Images.py
+4. Cropping.py
 5. Size_adjustment.py
-6. Augmentation.py
+6. Augmentation_change.py
 7. pathology.py
-8. model_development_and_evaluation.py (You will want to replace the "model_epoch_37.pth" with your best trained result)
-9. OR, you could directly evaluate our model's performence with model_evaluation.py and our best saved check point "model_epoch_37.pth"
-
-Steps to run the code for Figure 1B and 1C:
-1. make sure you run the first 5 steps of the above lists
-2. full_image_size&cropped_area.py
-3. R_visualization.R
+8. getting_the_weights.py
+9. cnn__with_shap.py
 
 ## Results
 The model's performance evaluation is based on the checkpoint with the highest validation accuracy.

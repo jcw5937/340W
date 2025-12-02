@@ -53,11 +53,9 @@ The model's performance evaluation is based on the checkpoint with the highest v
 
 The best performed checkpoint can be downloaded from [here](https://drive.google.com/drive/folders/18RxhTm9Oxak1dA0d2xihnHWekmEVug6h?usp=sharing)
 
-Accuracy, precision, recall, F1 score, and a confusion matrix are outlined in below:
-<div style="text-align: center;">
-  <img width="900" alt="image" src="https://github.com/user-attachments/assets/57db4ea3-807b-4bbf-a799-e213be14a230">
-</div>
+Accuracy, precision, recall, F1 score, and ROC AUC are shown below:
 
+<img width="545" height="156" alt="Screenshot 2025-12-02 at 6 56 01 PM" src="https://github.com/user-attachments/assets/8ec26699-7093-402f-bdb4-4102dc88d553" />
 
 ## Example output
 Our example outputs, including data processing, data visualization and model development and evaluation, are saved in folder example_output.

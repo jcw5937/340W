@@ -10,3 +10,5 @@ This project is adapted from a deep-learning pipeline from the scientific paper,
 https://pmc.ncbi.nlm.nih.gov/articles/PMC11549440/pdf/41598_2024_Article_78648.pdf 
 
 The workflow includes data preprocessing, ROI extraction, CNN training, performance evaluation, and SHAP interpretability analysis.
+
+For information about the pipeline used, see the README file in the code folder.

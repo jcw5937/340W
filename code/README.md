@@ -2,6 +2,12 @@
 
 Publication can be accessed from [here]( https://www.nature.com/articles/s41598-024-78648-0).
 
+## Notice
+
+The following is from the repository of the original paper which this project builds on: https://pmc.ncbi.nlm.nih.gov/articles/PMC11549440/pdf/41598_2024_Article_78648.pdf 
+
+Some additional code documents were added which were needed adapt the pipeline to fit a cluster environment. The original documents were updated and still retain the same order.
+
 ## Overview
 
 Accessible mammography datasets and innovative machine learning techniques are at the forefront of computer-aided breast cancer diagnosis. However, the opacity surrounding private datasets and the unclear methodology behind the selection of subset images from publicly available databases for model training and testing, coupled with the arbitrary incompleteness or inaccessibility of code, markedly intensifies the obstacles in replicating and validating the model's efficacy. These challenges, in turn, erect barriers for subsequent researchers striving to learn and advance this field. To address these limitations, we provide a pilot codebase covering the entire process from image preprocessing to model development and evaluation pipeline, utilizing the publicly available Curated Breast Imaging Subset of Digital Database for Screening Mammography (CBIS-DDSM) mass subset, including both full images and regions of interests (ROIs). We have identified that increasing the input size could improve the detection accuracy of malignant cases within each set of models. Collectively, our efforts hold promise in accelerating global software development for breast cancer diagnosis by leveraging our codebase and structure, while also integrating other advancements in the field.

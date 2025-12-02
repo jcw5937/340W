@@ -58,20 +58,7 @@ Accuracy, precision, recall, F1 score, and ROC AUC are shown below:
 <img width="545" height="156" alt="Screenshot 2025-12-02 at 6 56 01 PM" src="https://github.com/user-attachments/assets/8ec26699-7093-402f-bdb4-4102dc88d553" />
 
 ## Example output
-Our example outputs, including data processing, data visualization and model development and evaluation, are saved in folder example_output.
-
-## Identified images with unwanted white edges
-Identified cropped images with unwanted white backgrounds are stored in folder image_with_white_edge.
-
-## Others
-Other outputs that the authors think might be helpful can be found under folder Others, including the calculated full image size, percentage per 598 by 598 areas for corpped images, pathology info, identified mismatch info in sizewize between ROI and full images.
-
-(598_percentage_all.csv,
-all_mass_pathology.csv,
-heaght_width_FULL.csv,
-mismated_test_image_info(original).csv,
-and
-mismated_train_image_info(original).csv.)
+Our example outputs including the shap overlay are displayed in the work folder.
 
 ## We appreciate you attention.
 

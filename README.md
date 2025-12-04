@@ -1,6 +1,6 @@
 # An open codebase for enhancing transparency in deep learning-based breast cancer diagnosis utilizing CBIS-DDSM data
 
-Our scientific report can be accessed from [here](https://pennstateoffice365-my.sharepoint.com/:w:/g/personal/nks5711_psu_edu/EQndwEHjHdFLqXc1PUi3t58Bcr3vgPz8i0HVIsFOy1Vt6A?rtime=GgBlXGoz3kg).
+Our detailed scientific report can be accessed from [here](https://pennstateoffice365-my.sharepoint.com/:w:/g/personal/nks5711_psu_edu/EQndwEHjHdFLqXc1PUi3t58Bcr3vgPz8i0HVIsFOy1Vt6A?rtime=GgBlXGoz3kg).
 
 ## Notice: Credits
 

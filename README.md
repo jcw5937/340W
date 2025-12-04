@@ -8,11 +8,17 @@ Credits to the paper for base code and overview:
 
 Liao, L., Aagaard, E.M. An open codebase for enhancing transparency in deep learning-based breast cancer diagnosis utilizing CBIS-DDSM data. Sci Rep 14, 27318 (2024). https://doi.org/10.1038/s41598-024-78648-0
 
-Additional code documents were added which were needed to adapt the pipeline to fit a cluster environment. These have been added to the steps section. 
+Our contributions are 
+
+1. Additional code documents added to adapt the pipeline to fit a cluster environment. These have been added to the steps section.
+2. Optimized CNN model
+3. SHAP Overlay 
 
 ## Innovation:
 
 Our innovation was SHAP (SHapley Additive exPlanations), is an interpretability method that uses a heatmap to display which parts of the processed images were used in classification. The SHAP model was added to the model_development_and_evaluation.py file and the updated name is cnn_with_shap.py.
+
+For information, see the report (listed at the top of this document).
 
 ## Overview
 

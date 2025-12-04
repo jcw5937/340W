@@ -36,7 +36,7 @@ Full image size and the cropped area per 598 by 598 pixels are plotted as below:
 ## Methods
 In general, our methods include: 1) converting DICOM to PNG format without altering bit depth, 2) mapping ROIs to corresponding full images to identify and crop abnormal areas while ensuring size congruence, 3) confirming sufficient crop size coverage for most abnormal regions, 4) appending cropped images to the preliminary target **598 × 598** pixels with centered abnormal areas and removal of unwanted backgrounds, 5) performing data augmentation for enhanced diversity, 6) processing and splitting images into training, validation, and testing sets for model development, 7) optimizing computational efficient Xception network for model development, and 8) assessing effectiveness using multiple matrices and visualizations.
 
-Steps to run the code we provided for model development:
+Steps to run the code for model development:
 
 1. Convert_DICOM_to_PNG.py
 2. Convert_DICOM_to_PNG_full.py
@@ -47,6 +47,13 @@ Steps to run the code we provided for model development:
 7. pathology.py
 8. getting_the_weights.py
 9. cnn__with_shap.py
+
+Instructions to run the code on the cluster:
+
+1. SSH to cluster:               ssh -J [insert credentials]@ssh.ist.psu.edu [insert credentials]@i4-cs-gpu02.ist.psu.edu
+2. Load the overall directory:   cd /data/ds340w
+3. Activate the VENV:            source /data/ds340w/cbis/bin/activate
+4. Run the model document:       python code/cnn_with_shap.py
 
 ## Results
 The model's performance evaluation is based on the checkpoint with the highest validation accuracy.

@@ -14,7 +14,7 @@ Our contributions are
 2. Optimized CNN model
 3. SHAP Overlay 
 
-## Innovation:
+## Innovation
 
 Our innovation was SHAP (SHapley Additive exPlanations), is an interpretability method that uses a heatmap to display which parts of the processed images were used in classification. The SHAP model was added to the model_development_and_evaluation.py file and the updated name is cnn_with_shap.py.
 

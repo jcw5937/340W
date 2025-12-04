@@ -2,15 +2,13 @@
 
 Our scientific report can be accessed from [here](https://pennstateoffice365-my.sharepoint.com/:w:/g/personal/nks5711_psu_edu/EQndwEHjHdFLqXc1PUi3t58Bcr3vgPz8i0HVIsFOy1Vt6A?rtime=GgBlXGoz3kg).
 
-## Notice
-
-The following is from the repository built on the original paper which can be accessed from [here]( https://www.nature.com/articles/s41598-024-78648-0).
-
-Some additional code documents were added which were needed to adapt the pipeline to fit a cluster environment. These have been added to the steps section. 
+## Notice: Credits
 
 Credits to the paper for base code and overview:
 
 Liao, L., Aagaard, E.M. An open codebase for enhancing transparency in deep learning-based breast cancer diagnosis utilizing CBIS-DDSM data. Sci Rep 14, 27318 (2024). https://doi.org/10.1038/s41598-024-78648-0
+
+Additional code documents were added which were needed to adapt the pipeline to fit a cluster environment. These have been added to the steps section. 
 
 ## Innovation:
 

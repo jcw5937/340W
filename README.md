@@ -8,7 +8,7 @@ Credits to the paper for base code and overview:
 
 Liao, L., Aagaard, E.M. An open codebase for enhancing transparency in deep learning-based breast cancer diagnosis utilizing CBIS-DDSM data. Sci Rep 14, 27318 (2024). https://doi.org/10.1038/s41598-024-78648-0
 
-Our contributions are 
+Our contributions include:
 
 1. Additional code documents added to adapt the pipeline to fit a cluster environment. These have been added to the steps section.
 2. Optimized CNN model
